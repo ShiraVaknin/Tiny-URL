@@ -8,13 +8,14 @@ const bodyParsr = require('body-parser')
 const productRouter = require('./Routes/product.router')
 const LinkRouter = require('./Routes/LinkRouter')
 const UserRouter = require('./Routes/UserRouter')
-
+const LinkController = require('./Controllers/LinkController')
 app.use(cors())
 
 app.use(bodyParsr.json())
 app.use('/products', productRouter)
 app.use('/links', LinkRouter)
 app.use('/users', UserRouter)
+app.use('/tinyurl/:newurl', LinkController.redirect)
 
 const connectionParams = {
     useNewUrlParser: true,

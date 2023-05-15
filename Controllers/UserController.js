@@ -19,23 +19,22 @@ const UserController = {
         }
     },
     addUser: async(req, res) => {
-        const newProduct = new UserModel(req.body)
-        newProduct.save()
-            .then(product => {
-                res.send(product)
+        const addUser = new UserModel(req.body)
+        const user = await UserModel.findOne({ password:addUser.password })
+        if(user == null){ 
+            addUser.save()
+            .then(newUser => {
+                res.send(newUser)
             }).catch(err => {
                 console.log(err)
             })
-        // const {user} = req.body;
-        // try {
-        //     const newUser = UserModel.create({user});
-        //     res.json(newUser);
-        // } catch (error) {
-        //     res.status(400).json({message: error.message})
-            
-        // }
+        }
+        else{
+            res.send("User with that password already exists")
+        }
+       
     },
-    updateUser: async(req, res) => {
+    updateUser: async(req, res) => {//לשלוף את הבנאדם קודם ואז להכניס את הID
         const {id} = req.params;
         try {
             const user = await UserModel.findByIdAndUpdate(id, req.body, {new:true});

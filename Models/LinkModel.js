@@ -3,12 +3,16 @@ const mongoose = require('mongoose')
 const links = mongoose.Schema({
     newUrl:{
         type:String,
-        require:true
     },
     origionUrl:{
         type:String,
-        require:true
-    }
+    },
+    clicks:[
+        {
+            insertDate: Date,
+            ipAdress:String
+        }
+    ]
 });
 
 module.exports =  mongoose.model("links", links)

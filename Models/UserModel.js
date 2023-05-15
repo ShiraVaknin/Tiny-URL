@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const links = require('./LinkModel')
 
 const users = mongoose.Schema({
     name:{
@@ -10,9 +11,10 @@ const users = mongoose.Schema({
     password:{
         type:String,
     },
-    links:{
-        type:[],
-    },
+    links:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'links',
+    }],
 })
 
 module.exports = mongoose.model("users", users)
