@@ -1,4 +1,5 @@
 const UserModel = require("../Models/UserModel.js");
+const LinkModel = require('../Models/LinkModel.js')
 
 const UserController = {
 
@@ -34,39 +35,37 @@ const UserController = {
         }
        
     },
-    updateUser: async(req, res) => {//לשלוף את הבנאדם קודם ואז להכניס את הID
-        const {id} = req.params;
+    updateUser: async(req, res) => {
+        const {password} = req.params;
         try {
-            const user = await UserModel.findByIdAndUpdate(id, req.body, {new:true});
-            res.stats(200).json(user)
-        } catch (error) {
-            res.status(400).json({message: error.message})
-        }
-    },
-    deleteUser: async (req, res) => {
-        const {id}= req.params;
-        try {
-            const user = await UserModel.findByIdAndDelete(id);
+           const updateUser = await UserModel.findOne({password:password})
+           if(updateUser == null){
+            return res.send('This user not exist')
+           }
+            const user = await UserModel.findByIdAndUpdate(updateUser._id, req.body, {new:true});
             res.status(200).json(user)
         } catch (error) {
             res.status(400).json({message: error.message})
         }
     },
-    // addLink:async (req, res) => {
-    //     //the link object in the body and the id of the person sended in the params.
-    //     const {link} = req.body;
-    //     const {id} = req.params;
-    //     try {
-    //         const user = await UserModel.findById(id)
-    //         const newLink = await LinkModel.create({link});
-    //         user.links.push(newLink);//הכנסת הלינק למערך
-    //         await UserModel.findByIdAndUpdate(id, user, {new:true});
-    //         res.json(newLink);
-    //     } catch (error) {
-    //         res.status(400).json({message: error.message})
-            
-    //     }
-    // }
+    deleteUser: async (req, res) => {
+        const {password}= req.params;
+        try {
+            const deleteUser = await UserModel.findOne({password:password})
+            if(deleteUser == null){
+                return res.send('This user not exist');
+            }
+            const links = deleteUser.links || [];
+            for (const link of links){
+                console.log(link);
+                await LinkModel.findByIdAndDelete(link)
+            }
+            const user = await UserModel.findByIdAndDelete(deleteUser._id);
+            res.status(200).json(deleteUser)
+        } catch (error) {
+            res.status(400).json({message: error.message})
+        }
+    },
 }
 
 module.exports = UserController;

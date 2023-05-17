@@ -26,7 +26,7 @@ const LinkController = {
             const user = await UserModel.findOne({password:password})
             if(!user){
                 return res.send("The user doesn't exist")
-            }
+            }//להוסיף בדיקה שזה לא קיים כבר
             const newLink = await links.create(link);
             user.links.push(newLink);
             await user.save()
@@ -36,19 +36,30 @@ const LinkController = {
         }
     },
     updateLink: async(req, res) => {
-        const {id} = req.params;
+        const {newUrl} = req.params;
         try {
-            const link = await links.findByIdAndUpdate(id, req.body, {new:true});
-            res.stats(200).json(link)
+            const newLink = await LinkModel.findOne({newUrl:newUrl});
+            if(newLink == null){
+                return res.send("This url not exist")
+            }
+            const link = await links.findByIdAndUpdate(newLink._id, req.body, {new:true});
+            res.status(200).json(link)
         } catch (error) {
             res.status(400).json({message: error.message})
         }
     },
-    //chek the user before this function
     deleteLink: async (req, res) => {
-        const {id}= req.params;
+        //the id of the user will be in the token, now i send it in the params.
+        const {newUrl}= req.params;
+        const {id} = req.params;
         try {
-            const link = await links.findByIdAndDelete(id);
+            const newLink = await LinkModel.findOne({newUrl:newUrl});
+            if(newLink == null){
+                return res.send("This url not exist")
+            }
+            const link = await links.findById(newLink._id);
+            await UserModel.findByIdAndUpdate(id, { $pull: {links:newLink._id}})
+            link.remove();
             res.status(200).json(link)
         } catch (error) {
             res.status(400).json({message: error.message})
